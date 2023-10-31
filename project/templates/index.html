@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>project-rds</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("form#run_code").on("submit", function(event) {
+                event.preventDefault();
+                var formData = new FormData($(this)[0]);
+                $.ajax({
+                    url: "/run_python_code",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.error) {
+                            alert(response.error);
+                        } else if (response.result) {
+                            $("#output").text(response.result);
+                        }
+                    }
+                });
+            });
+
+            $("form#show_image").on("submit", function(event) {
+                event.preventDefault();
+                var image_filename = $("#image_filename").val();
+                if (image_filename) {
+                    $.ajax({
+                        url: "/show_image",
+                        type: "POST",
+                        data: { image_filename: image_filename },
+                        success: function(response) {
+                            if (response.error) {
+                                alert(response.error);
+                            } else {
+                                $("#image_display").html('<img src="' + response + '" width="400">');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>TEAM-RDS</h1>
+    <h2>YOLO</h2>
+    <div>
+        <form id="run_code">
+            <input type="file" name="image">
+            <input type="submit" value="분석">
+        </form>
+        <div id="output"></div>
+    </div>
+    
+    <h1>결과</h1>
+    <div>
+        <form id="show_image">
+            <input type="text" id="image_filename" placeholder="output한 이미지를 넣어주세요! (예: output_sample.jpg)">
+            <input type="submit" value="결과 띄우기">
+        </form>
+        <div id="image_display"></div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            $("form#show_image").on("submit", function(event) {
+                event.preventDefault();
+                var image_filename = $("#image_filename").val();
+                if (image_filename) {
+                    $.ajax({
+                        url: "/show_image",
+                        type: "POST",
+                        data: { image_filename: image_filename },
+                        success: function(response) {
+                            if (response.error) {
+                                alert(response.error);
+                            } else {
+                                $("#image_display").html('<img src="/static/output_images/' + image_filename + '" width="1000">');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
